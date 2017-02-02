@@ -1,0 +1,6 @@
+.DS_Store
+node_modules/
+gae-server/vendor
+dist/
+npm-debug.log
+src/config.js
