@@ -4,6 +4,6 @@ import config from './config'
 firebase.initializeApp(config.firebase)
 export default {
 	ref(path) {
-		return firebase.database().ref(`${env}/${path}`)
+		return firebase.database().ref(`${config.app_name}/${env}/${path}`)
 	}
 }

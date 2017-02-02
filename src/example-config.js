@@ -1,4 +1,5 @@
 module.exports = {
+	app_name: 'google-api-firebase',
 	google: {
 		client_id: '****.apps.googleusercontent.com',	
 		api_key: '****',
