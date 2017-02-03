@@ -57,7 +57,7 @@ const routes = [
 				auth.signIn().then((e) => {
 					console.log('SignIn');
 					updateAuthStatus().then(() => {
-						next()
+						next({name: 'home'})
 					})
 				})
 			}
@@ -95,18 +95,15 @@ function initGoogleAPI() {
 		script.onload = (e) => {
 			gapi.load('client:auth2', () => {
 				gapi.client.init({
-	            	discoveryDocs: config.google.discovery_docs
-		        }).then(() => {
-					gapi.auth2.init({
-						client_id: config.google.client_id,
-						apiKey: config.google.api_key,
-		            	clientId: config.google.client_id,
-		            	scope: config.scope,
-	            		hosted_domain: config.google.hosted_domain
-	        		}).then(() => {
-						resolve()
-        			})
-	        	});
+					apiKey: config.google.api_key,
+	            	clientId: config.google.client_id,
+	            	discoveryDocs: config.google.discovery_docs,
+	            	scope: config.google.scope,
+	        	}).then(() => {
+					store.commit('currentUserProfile', null)
+					store.commit('authenticated', false)
+					resolve()					
+				})
         	});
 		}
 		document.getElementsByTagName('head')[0].appendChild(script);
@@ -115,6 +112,14 @@ function initGoogleAPI() {
 
 function updateAuthStatus() {
 	return new Promise((resolve) => {
+		
+		// we have no auth!
+		if (!gapi.auth2.getAuthInstance()) {
+			store.commit('authenticated', false)
+			resolve(false)
+			return;
+		}
+		
 		var googleUser = gapi.auth2.getAuthInstance().currentUser.get()
 		var googleProfile = googleUser.getBasicProfile()
 		var isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get()

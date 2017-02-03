@@ -27,9 +27,9 @@
     
                         <!-- loaded google calendar events -->
                         <div class="google-calendar-events">
-                            <template v-if="!isLoadingEvents">
+                            <template v-if="!isLoadingEvents && !errors.length">
                                 <label class="label">Google Calendar Events</label>
-                                <ul class="events">
+                                <ul class="events" v-if="!errors.length">
                                     <li v-for="event in events">
                                         <a :href="event.htmlLink">
                                             <div class="info">
@@ -46,6 +46,11 @@
                                 <div class="loading-events">
                                     <i class="fa fa-circle-o-notch fa-spin fa-2x fa-fw"></i>
                                     <span class="sr-only">Loading...</span>
+                                </div>
+                            </template>
+                            <template v-if="!isLoadingEvents && errors.length">
+                                <div class="errors help is-danger">
+                                    <span v-for="error in errors">{{error.message}}</span>
                                 </div>
                             </template>
                         </div>
@@ -79,6 +84,11 @@ export default {
                 }).then((response) => {
                     this.isLoadingEvents = false;
                     this.events = response.result.items;
+                }, (e) => {
+                    if (e.result.error) {
+                        this.errors = e.result.error.errors
+                        this.isLoadingEvents = false
+                    }
                 })
             }
         }
@@ -86,6 +96,7 @@ export default {
     data () {
         return {
             isLoadingEvents: true,
+            errors: [],
             events: []
         }
     },
@@ -118,6 +129,17 @@ export default {
     justify-content: center;
     align-items: center;
     display: flex;
+}
+.errors {
+    padding: 10px;
+    text-align: center;
+    width: 100%;
+    span {
+        padding: 10px;
+        background: #ccc;
+        font-size: 18px;
+        text-align: center;
+    }
 }
 .events {
     width: 100%;
